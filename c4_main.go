@@ -10,14 +10,20 @@ import (
 
 func main() {
 	g := game.New()
-	for !g.IsGameOver() {
+	for {
 		fmt.Println(g)
 		v := requestMove()
 		if err := g.Move(v); err != nil {
 			fmt.Printf("Error: %v\n", err)
 			continue
 		}
-	}
+		if g.IsGameOver() {
+			fmt.Println(g)
+			fmt.Printf("Player %v wins!\n", g.Turn)
+			return
+		}
+		g.NextTurn()
+	}	
 }
 
 func requestMove() int {
