@@ -4,11 +4,7 @@ import (
 	"fmt"
 )
 
-type State struct {
-	Grid [][]string
-	Turn Player
-	AI bool
-}
+type Column int
 
 type Player int
 
@@ -23,6 +19,11 @@ const (
     White Player = iota
     Black
 )
+
+type State struct {
+	Grid [][]string
+	Turn Player
+}
 
 func New() *State {
 	return &State {
@@ -67,7 +68,7 @@ func (s *State) IsGameOver() bool    {
 	return !freeSpace
 }
 
-func (s *State) Move(i int) (*State, error) {
+func (s *State) Move(i Column) (*State, error) {
 	if i <= 0 || i > 7 {
 		return nil, fmt.Errorf("invalid move")
 	}

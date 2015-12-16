@@ -9,22 +9,36 @@ import (
 )
 
 func main() {
+	var ai *game.AI
 	g := game.New()
-	g.AI = requestPlayWithAI()
+	if requestPlayWithAI() {
+		ai = &game.AI{}
+	}
 	for {
 		fmt.Println(g)
 		fmt.Printf("Player %v's turn!\n", g.Turn)
-		v := requestMove()
-		gg, err := g.Move(v);
+
+		// Move.
+		var col game.Column
+		if ai != nil && g.Turn == game.Black {
+			col = ai.ChooseMove(g)
+		} else {
+			col = requestMove()
+		}
+		gg, err := g.Move(col);
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			continue
 		}
+
+		// Check end game.
 		if gg.IsGameOver() {
 			fmt.Println(gg)
 			fmt.Printf("Player %v wins!\n", gg.Turn)
 			return
 		}
+
+		// Next player's turn.
 		g = gg.NextTurn()
 	}	
 }
@@ -43,7 +57,7 @@ func requestPlayWithAI() bool {
 	}
 }
 
-func requestMove() int {
+func requestMove() game.Column {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Enter move [0-6]: ")
@@ -53,6 +67,6 @@ func requestMove() int {
 		if err != nil {
 			continue
 		}
-		return v
+		return game.Column(v)
 	}
 }
