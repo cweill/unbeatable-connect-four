@@ -1,7 +1,8 @@
+// Package game contains all Connect-Four state, player, and rendering logic.
 package game
 
 import (
-	"fmt"
+	"errors"
 )
 
 // Player represents the current turn.
@@ -44,8 +45,8 @@ func New() *State {
 	}
 }
 
-// Copy creates a deep copy of a given state.
-func (s *State) Copy() *State {
+// copy creates a deep copy of a given state.
+func (s *State) copy() *State {
 	var g [][]string
 	for _, col := range s.Grid {
 		var c []string
@@ -94,8 +95,8 @@ type Column int
 const MaxColumn = Column(6)
 
 var (
-	InvalidMoveError = fmt.Errorf("invalid move")
-	ColumnFullError = fmt.Errorf("column is full")
+	InvalidMoveError = errors.New("invalid move")
+	ColumnFullError = errors.New("column is full")
 )
 
 func (s *State) IsValidMove(c Column) bool {
@@ -117,7 +118,7 @@ func (s *State) Move(c Column) (*State, error) {
 	if c < 0 || c > MaxColumn {
 		return nil, InvalidMoveError
 	}
-	cp := s.Copy()
+	cp := s.copy()
 	for _, row := range cp.Grid {
 		if row[c] == "" {
 			row[c] = cp.Turn.String()
@@ -131,7 +132,7 @@ func (s *State) Move(c Column) (*State, error) {
 // mutate the original object, instead it copies the state and returns a new 
 // state with the next player up.
 func (s *State) NextTurn() *State {
-	cp := s.Copy()
+	cp := s.copy()
 	if cp.Turn == White {
 		cp.Turn = Black
 	} else {
