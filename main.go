@@ -4,15 +4,16 @@ import (
 	"bufio"
     "fmt"
     "os"
+	"c4/ai"
 	"c4/game"
 	"strconv"
 )
 
 func main() {
-	var ai *game.AI
+	var aip *ai.AI
 	g := game.New()
 	if requestPlayWithAI() {
-		ai = &game.AI{}
+		aip = &ai.AI{Player: game.Black}
 	}
 	for {
 		fmt.Println(g)
@@ -20,8 +21,8 @@ func main() {
 
 		// Move.
 		var col game.Column
-		if ai != nil && g.Turn == game.Black {
-			col = ai.ChooseMove(g)
+		if aip != nil && g.Turn == aip.Player {
+			col = aip.ChooseMove(g)
 		} else {
 			col = requestMove()
 		}
@@ -60,13 +61,14 @@ func requestPlayWithAI() bool {
 func requestMove() game.Column {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
-		fmt.Print("Enter move [0-6]: ")
+		// One-index columns for simpler input.
+		fmt.Print("Enter move [1-7]: ")
 		scanner.Scan()
 		text := scanner.Text()
-		v, err := strconv.Atoi(text)
+		col, err := strconv.Atoi(text)
 		if err != nil {
 			continue
 		}
-		return game.Column(v)
+		return game.Column(col - 1)
 	}
 }

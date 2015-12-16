@@ -7,6 +7,21 @@ import (
 // Player represents the current turn.
 type Player int
 
+const (
+	// White is represented by an "X".
+	White Player = iota
+	// Black is represented by an "O".
+	Black
+)
+
+// Opponent returns the player's opponent.
+func (p Player) Opponent() Player {
+	if p == White {
+		return Black
+	}
+	return White
+}
+
 // String returns the string representation of a player.
 func (p Player) String() string {
 	if p == White {
@@ -14,13 +29,6 @@ func (p Player) String() string {
 	}
 	return "O"
 }
-
-const (
-	// White is represented by an "X".
-    White Player = iota
-    // Black is represented by an "O".
-    Black
-)
 
 // State represents the Connect-Four game's current state.
 type State struct {
@@ -46,8 +54,16 @@ func New() *State {
 
 // Copy creates a deep copy of a given state.
 func (s *State) Copy() *State {
+	var g [][]string
+	for _, col := range s.Grid {
+		var c []string
+		for _, v := range col {
+			c = append(c, v)
+		}
+		g = append(g, c)
+	}
 	return &State {
-		Grid: s.Grid,
+		Grid: g,
 		Turn: s.Turn,
 	}
 }
@@ -82,18 +98,14 @@ type Column int
 // Move places a chip in the selected column. It does not mutate the original
 // object, instead it copies the state and returns a new state with the move
 // applied.
-func (s *State) Move(i Column) (*State, error) {
-	if i <= 0 || i > 7 {
+func (s *State) Move(c Column) (*State, error) {
+	if c < 0 || c >= 7 {
 		return nil, fmt.Errorf("invalid move")
-	}
-	col := i - 1
-	if i == 0 {
-		col = 0
 	}
 	cp := s.Copy()
 	for _, row := range cp.Grid {
-		if row[col] == "" {
-			row[col] = cp.Turn.String()
+		if row[c] == "" {
+			row[c] = cp.Turn.String()
 			return cp, nil
 		}
 	}
@@ -115,7 +127,7 @@ func (s *State) NextTurn() *State {
 
 // String returns a string representation of the game board.
 func (s *State) String() string {
-	res := ""
+	res := "\n"
 	for i := len(s.Grid)-1; i >= 0; i-- {
 		row := s.Grid[i]
 		res += "|"
@@ -128,5 +140,6 @@ func (s *State) String() string {
 		}
 		res += "\n"
 	}
+	res += "|1|2|3|4|5|6|7|\n"
 	return res
 }
