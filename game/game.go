@@ -7,6 +7,7 @@ import (
 type State struct {
 	Grid [][]string
 	Turn Player
+	AI bool
 }
 
 type Player int
@@ -55,10 +56,10 @@ func (s *State) IsGameOver() bool    {
 			if j < len(s.Grid[i]) - 3 && v == s.Grid[i][j+1] && v == s.Grid[i][j+2] && v == s.Grid[i][j+3] {
 				return true
 			}
-			if i < len(s.Grid) - 3 &&v == s.Grid[i+1][j] && v == s.Grid[i+2][j] && v == s.Grid[i+3][j] {
+			if i < len(s.Grid) - 3 && v == s.Grid[i+1][j] && v == s.Grid[i+2][j] && v == s.Grid[i+3][j] {
 				return true
 			}
-			if i < len(s.Grid) - 3 && j < len(s.Grid[i]) - 3 && v == s.Grid[i][j+1] && v == s.Grid[i+2][j+2] && v == s.Grid[i+3][j+3] {
+			if i < len(s.Grid) - 3 && j < len(s.Grid[i]) - 3 && v == s.Grid[i+1][j+1] && v == s.Grid[i+2][j+2] && v == s.Grid[i+3][j+3] {
 				return true
 			}
 		}
@@ -67,13 +68,17 @@ func (s *State) IsGameOver() bool    {
 }
 
 func (s *State) Move(i int) (*State, error) {
-	if i < 0 || i >= 7 {
+	if i <= 0 || i > 7 {
 		return nil, fmt.Errorf("invalid move")
+	}
+	col := i - 1
+	if i == 0 {
+		col = 0
 	}
 	cp := s.Copy()
 	for _, row := range cp.Grid {
-		if row[i] == "" {
-			row[i] = cp.Turn.String()
+		if row[col] == "" {
+			row[col] = cp.Turn.String()
 			return cp, nil
 		}
 	}

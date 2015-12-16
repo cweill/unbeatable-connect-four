@@ -10,6 +10,7 @@ import (
 
 func main() {
 	g := game.New()
+	g.AI = requestPlayWithAI()
 	for {
 		fmt.Println(g)
 		fmt.Printf("Player %v's turn!\n", g.Turn)
@@ -26,6 +27,20 @@ func main() {
 		}
 		g = gg.NextTurn()
 	}	
+}
+
+func requestPlayWithAI() bool {
+	scanner := bufio.NewScanner(os.Stdin)
+	for {
+		fmt.Print("Enable AI? [y/n]: ")
+		scanner.Scan()
+		switch scanner.Text() {
+		case "y":
+			return true
+		case "n": 
+			return false
+		}
+	}
 }
 
 func requestMove() int {
