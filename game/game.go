@@ -36,6 +36,13 @@ func New() *State {
 	}
 }
 
+func (s *State) Copy() *State {
+	return &State {
+		Grid: s.Grid,
+		Turn: s.Turn,
+	}
+}
+
 func (s *State) IsGameOver() bool    {
 	var freeSpace bool
 	for i := 0; i < len(s.Grid); i++ {
@@ -59,25 +66,28 @@ func (s *State) IsGameOver() bool    {
 	return !freeSpace
 }
 
-func (s *State) Move(i int) error {
+func (s *State) Move(i int) (*State, error) {
 	if i < 0 || i >= 7 {
-		return fmt.Errorf("invalid move")
+		return nil, fmt.Errorf("invalid move")
 	}
-	for _, row := range s.Grid {
+	cp := s.Copy()
+	for _, row := range cp.Grid {
 		if row[i] == "" {
-			row[i] = s.Turn.String()
-			return nil
+			row[i] = cp.Turn.String()
+			return cp, nil
 		}
 	}
-	return fmt.Errorf("column is full")
+	return nil, fmt.Errorf("column is full")
 }
 
-func (s *State) NextTurn() {
-	if s.Turn == White {
-		s.Turn = Black
+func (s *State) NextTurn() *State {
+	cp := s
+	if cp.Turn == White {
+		cp.Turn = Black
 	} else {
-		s.Turn = White
+		cp.Turn = White
 	}
+	return cp
 }
 
 func (s *State) String() string {

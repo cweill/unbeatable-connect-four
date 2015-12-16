@@ -14,16 +14,17 @@ func main() {
 		fmt.Println(g)
 		fmt.Printf("Player %v's turn!\n", g.Turn)
 		v := requestMove()
-		if err := g.Move(v); err != nil {
+		gg, err := g.Move(v);
+		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			continue
 		}
-		if g.IsGameOver() {
-			fmt.Println(g)
-			fmt.Printf("Player %v wins!\n", g.Turn)
+		if gg.IsGameOver() {
+			fmt.Println(gg)
+			fmt.Printf("Player %v wins!\n", gg.Turn)
 			return
 		}
-		g.NextTurn()
+		g = gg.NextTurn()
 	}	
 }
 
