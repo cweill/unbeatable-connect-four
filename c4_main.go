@@ -12,6 +12,7 @@ func main() {
 	g := game.New()
 	for {
 		fmt.Println(g)
+		fmt.Printf("Player %v's turn!\n", g.Turn)
 		v := requestMove()
 		if err := g.Move(v); err != nil {
 			fmt.Printf("Error: %v\n", err)

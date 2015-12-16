@@ -32,6 +32,7 @@ func New() *State {
 			}
 			return g
 		}(),
+		Turn: White,
 	}
 }
 
@@ -62,13 +63,9 @@ func (s *State) Move(i int) error {
 	if i < 0 || i >= 7 {
 		return fmt.Errorf("invalid move")
 	}
-	chip := "x"
-	if s.Turn == Black {
-		chip = "o"
-	}
 	for _, row := range s.Grid {
 		if row[i] == "" {
-			row[i] = chip
+			row[i] = s.Turn.String()
 			return nil
 		}
 	}
