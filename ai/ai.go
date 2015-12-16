@@ -1,63 +1,69 @@
 package ai
 
 import (
-	"time"
 	"c4/game"
+	"math/rand"
+	"fmt"
 )
+
+const maxDepth = 5
 
 type AI struct {
 	Player game.Player
 }
 
 func (a *AI) ChooseMove(s *game.State) game.Column {
-	time.Sleep(500 * time.Millisecond)
-	return a.bestMove(s, 5)
+	fmt.Println(s.Turn)
+	col, _ := a.minmax(s, maxDepth, true)
+	return col
 }
 
 type value int
 
-func (a *AI) bestMove(s *game.State, depth int) game.Column {
-	bestCol := game.Column(-1)
-	bestVal := value(-1)
-	for i := game.Column(0); i < game.Column(len(s.Grid)); i++ {
-		ss, _ := s.Move(i)
-		if a.minmax(ss, depth, a.Player) > bestVal {
-			bestCol = i
-		}
+const (
+	infinite = value(99999999)
+	uncertain = value(0)
+	win = value(10)
+	loss = value(-10)
+)
+
+func (a *AI) stateValue(s *game.State, depth int) value {
+	if !s.IsGameOver() {
+		return uncertain
 	}
-	return bestCol
+	v := value(depth + 1)
+	if s.Turn == a.Player {
+		return win * v
+	}
+	return loss * v
 }
 
-func (a *AI) minmax(s *game.State, depth int, p game.Player) value {
+func (a *AI) minmax(s *game.State, depth int, maxPlayer bool) (game.Column, value) {
 	if depth == 0 || s.IsGameOver() {
-		return a.stateValue(s)
+		return game.Column(rand.Intn(int(game.MaxColumn))), a.stateValue(s, depth)
 	}
-	bestVal := value(1)
-	if p == a.Player {
-		bestVal = value(-1)
+	bestVal := infinite
+	if maxPlayer {
+		bestVal = -infinite
 	}
-	for i := game.Column(0); i < game.Column(len(s.Grid)); i++ {
+	var bestCol game.Column
+	for i := game.Column(0); i <= game.MaxColumn; i++ {
+		if !s.IsValidMove(i) {
+			continue
+		}
 		ss, _ := s.Move(i)
-		val := a.minmax(ss, depth - 1, p.Opponent())
-		if p == a.Player {
-			if val >= bestVal {
+		_, val := a.minmax(ss.NextTurn(), depth - 1, !maxPlayer)
+		if maxPlayer {
+			if val > bestVal {
 				bestVal = val
+				bestCol = i
 			}
 		} else {
-			if val <= bestVal {
+			if val < bestVal {
 				bestVal = val
+				bestCol = i
 			}
 		}
 	}
-	return bestVal
-}
-
-func (a *AI) stateValue(s *game.State) value {
-	if !s.IsGameOver() {
-		return 0
-	}
-	if s.Turn == a.Player {
-		return 1
-	}
-	return -1
+	return bestCol, bestVal
 }

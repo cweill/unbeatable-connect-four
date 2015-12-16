@@ -14,14 +14,6 @@ const (
 	Black
 )
 
-// Opponent returns the player's opponent.
-func (p Player) Opponent() Player {
-	if p == White {
-		return Black
-	}
-	return White
-}
-
 // String returns the string representation of a player.
 func (p Player) String() string {
 	if p == White {
@@ -87,6 +79,9 @@ func (s *State) IsGameOver() bool    {
 			if i < len(s.Grid) - 3 && j < len(s.Grid[i]) - 3 && v == s.Grid[i+1][j+1] && v == s.Grid[i+2][j+2] && v == s.Grid[i+3][j+3] {
 				return true
 			}
+			if i < len(s.Grid) - 3 && j >= 3 && v == s.Grid[i+1][j-1] && v == s.Grid[i+2][j-2] && v == s.Grid[i+3][j-3] {
+				return true
+			}
 		}
 	}
 	return !freeSpace
@@ -95,12 +90,32 @@ func (s *State) IsGameOver() bool    {
 // Column is the selected column to drop the player's chip.
 type Column int
 
+// MaxColumn is index of the last column.
+const MaxColumn = Column(6)
+
+var (
+	InvalidMoveError = fmt.Errorf("invalid move")
+	ColumnFullError = fmt.Errorf("column is full")
+)
+
+func (s *State) IsValidMove(c Column) bool {
+	if c < 0 || c > MaxColumn {
+		return false
+	}
+	for _, row := range s.Grid {
+		if row[c] == "" {
+			return true
+		}
+	}
+	return false
+}
+
 // Move places a chip in the selected column. It does not mutate the original
 // object, instead it copies the state and returns a new state with the move
 // applied.
 func (s *State) Move(c Column) (*State, error) {
-	if c < 0 || c >= 7 {
-		return nil, fmt.Errorf("invalid move")
+	if c < 0 || c > MaxColumn {
+		return nil, InvalidMoveError
 	}
 	cp := s.Copy()
 	for _, row := range cp.Grid {
@@ -109,14 +124,14 @@ func (s *State) Move(c Column) (*State, error) {
 			return cp, nil
 		}
 	}
-	return nil, fmt.Errorf("column is full")
+	return nil, ColumnFullError
 }
 
 // NextTurn returns a new state where it's the next player's turn. It does not 
 // mutate the original object, instead it copies the state and returns a new 
 // state with the next player up.
 func (s *State) NextTurn() *State {
-	cp := s
+	cp := s.Copy()
 	if cp.Turn == White {
 		cp.Turn = Black
 	} else {
