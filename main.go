@@ -2,10 +2,10 @@ package main
 
 import (
 	"bufio"
-    "fmt"
-    "os"
 	"c4/ai"
 	"c4/game"
+	"fmt"
+	"os"
 	"strconv"
 )
 
@@ -26,7 +26,7 @@ func main() {
 		} else {
 			col = requestMove()
 		}
-		gg, err := g.Move(col);
+		gg, err := g.Move(col)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			continue
@@ -41,7 +41,7 @@ func main() {
 
 		// Next player's turn.
 		g = gg.NextTurn()
-	}	
+	}
 }
 
 func requestPlayWithAI() bool {
@@ -52,7 +52,7 @@ func requestPlayWithAI() bool {
 		switch scanner.Text() {
 		case "y":
 			return true
-		case "n": 
+		case "n":
 			return false
 		}
 	}

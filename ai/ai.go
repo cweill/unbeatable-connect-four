@@ -22,10 +22,10 @@ func (a *AI) ChooseMove(s *game.State) game.Column {
 type value int
 
 const (
-	infinite = value(99999999)
+	infinite  = value(99999999)
 	uncertain = value(0)
-	win = value(10)
-	loss = value(-10)
+	win       = value(10)
+	loss      = value(-10)
 )
 
 // stateValue assigns a value to a state. A losing state gets a negative score,
@@ -37,7 +37,7 @@ func (a *AI) stateValue(s *game.State, depth int) value {
 	// We want to penalize losing and reward winning more at a shallower depth.
 	multi := value(depth + 1)
 	if s.Turn != a.Player {
-		// If the game's turn is over and it's not the AI player's turn, it 
+		// If the game's turn is over and it's not the AI player's turn, it
 		// means the AI was the last to make a move.
 		return win * multi
 	}
@@ -60,7 +60,7 @@ func (a *AI) minmax(s *game.State, depth int, maxPlayer bool) (game.Column, valu
 			continue
 		}
 		ss, _ := s.Move(i)
-		_, val := a.minmax(ss.NextTurn(), depth - 1, !maxPlayer)
+		_, val := a.minmax(ss.NextTurn(), depth-1, !maxPlayer)
 		if maxPlayer {
 			if val > bestVal {
 				bestVal = val

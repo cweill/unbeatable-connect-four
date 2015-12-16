@@ -33,8 +33,8 @@ type State struct {
 
 // New returns a new Connect-Four game.
 func New() *State {
-	return &State {
-		Grid: func () [][]string {
+	return &State{
+		Grid: func() [][]string {
 			g := make([][]string, 6)
 			for i := 0; i < len(g); i++ {
 				g[i] = make([]string, 7)
@@ -55,14 +55,14 @@ func (s *State) copy() *State {
 		}
 		g = append(g, c)
 	}
-	return &State {
+	return &State{
 		Grid: g,
 		Turn: s.Turn,
 	}
 }
 
 // IsGameOver returns whether a player won or whether they reached a stalemate.
-func (s *State) IsGameOver() bool    {
+func (s *State) IsGameOver() bool {
 	var freeSpace bool
 	for i := 0; i < len(s.Grid); i++ {
 		for j := 0; j < len(s.Grid[i]); j++ {
@@ -71,16 +71,16 @@ func (s *State) IsGameOver() bool    {
 				freeSpace = true
 				continue
 			}
-			if j < len(s.Grid[i]) - 3 && v == s.Grid[i][j+1] && v == s.Grid[i][j+2] && v == s.Grid[i][j+3] {
+			if j < len(s.Grid[i])-3 && v == s.Grid[i][j+1] && v == s.Grid[i][j+2] && v == s.Grid[i][j+3] {
 				return true
 			}
-			if i < len(s.Grid) - 3 && v == s.Grid[i+1][j] && v == s.Grid[i+2][j] && v == s.Grid[i+3][j] {
+			if i < len(s.Grid)-3 && v == s.Grid[i+1][j] && v == s.Grid[i+2][j] && v == s.Grid[i+3][j] {
 				return true
 			}
-			if i < len(s.Grid) - 3 && j < len(s.Grid[i]) - 3 && v == s.Grid[i+1][j+1] && v == s.Grid[i+2][j+2] && v == s.Grid[i+3][j+3] {
+			if i < len(s.Grid)-3 && j < len(s.Grid[i])-3 && v == s.Grid[i+1][j+1] && v == s.Grid[i+2][j+2] && v == s.Grid[i+3][j+3] {
 				return true
 			}
-			if i < len(s.Grid) - 3 && j >= 3 && v == s.Grid[i+1][j-1] && v == s.Grid[i+2][j-2] && v == s.Grid[i+3][j-3] {
+			if i < len(s.Grid)-3 && j >= 3 && v == s.Grid[i+1][j-1] && v == s.Grid[i+2][j-2] && v == s.Grid[i+3][j-3] {
 				return true
 			}
 		}
@@ -96,7 +96,7 @@ const MaxColumn = Column(6)
 
 var (
 	InvalidMoveError = errors.New("invalid move")
-	ColumnFullError = errors.New("column is full")
+	ColumnFullError  = errors.New("column is full")
 )
 
 func (s *State) IsValidMove(c Column) bool {
@@ -128,8 +128,8 @@ func (s *State) Move(c Column) (*State, error) {
 	return nil, ColumnFullError
 }
 
-// NextTurn returns a new state where it's the next player's turn. It does not 
-// mutate the original object, instead it copies the state and returns a new 
+// NextTurn returns a new state where it's the next player's turn. It does not
+// mutate the original object, instead it copies the state and returns a new
 // state with the next player up.
 func (s *State) NextTurn() *State {
 	cp := s.copy()
@@ -144,7 +144,7 @@ func (s *State) NextTurn() *State {
 // String returns a string representation of the game board.
 func (s *State) String() string {
 	res := "\n"
-	for i := len(s.Grid)-1; i >= 0; i-- {
+	for i := len(s.Grid) - 1; i >= 0; i-- {
 		row := s.Grid[i]
 		res += "|"
 		for _, v := range row {
