@@ -4,10 +4,10 @@ import (
 	"fmt"
 )
 
-type Column int
-
+// Player represents the current turn.
 type Player int
 
+// String returns the string representation of a player.
 func (p Player) String() string {
 	if p == White {
 		return "X"
@@ -16,15 +16,21 @@ func (p Player) String() string {
 }
 
 const (
+	// White is represented by an "X".
     White Player = iota
+    // Black is represented by an "O".
     Black
 )
 
+// State represents the Connect-Four game's current state.
 type State struct {
+	// Grid represents the chips in the board.
 	Grid [][]string
+	// Turn is the current player's turn.
 	Turn Player
 }
 
+// New returns a new Connect-Four game.
 func New() *State {
 	return &State {
 		Grid: func () [][]string {
@@ -38,6 +44,7 @@ func New() *State {
 	}
 }
 
+// Copy creates a deep copy of a given state.
 func (s *State) Copy() *State {
 	return &State {
 		Grid: s.Grid,
@@ -45,6 +52,7 @@ func (s *State) Copy() *State {
 	}
 }
 
+// IsGameOver returns whether a player won or whether they reached a stalemate.
 func (s *State) IsGameOver() bool    {
 	var freeSpace bool
 	for i := 0; i < len(s.Grid); i++ {
@@ -68,6 +76,12 @@ func (s *State) IsGameOver() bool    {
 	return !freeSpace
 }
 
+// Column is the selected column to drop the player's chip.
+type Column int
+
+// Move places a chip in the selected column. It does not mutate the original
+// object, instead it copies the state and returns a new state with the move
+// applied.
 func (s *State) Move(i Column) (*State, error) {
 	if i <= 0 || i > 7 {
 		return nil, fmt.Errorf("invalid move")
@@ -86,6 +100,9 @@ func (s *State) Move(i Column) (*State, error) {
 	return nil, fmt.Errorf("column is full")
 }
 
+// NextTurn returns a new state where it's the next player's turn. It does not 
+// mutate the original object, instead it copies the state and returns a new 
+// state with the next player up.
 func (s *State) NextTurn() *State {
 	cp := s
 	if cp.Turn == White {
@@ -96,6 +113,7 @@ func (s *State) NextTurn() *State {
 	return cp
 }
 
+// String returns a string representation of the game board.
 func (s *State) String() string {
 	res := ""
 	for i := len(s.Grid)-1; i >= 0; i-- {
