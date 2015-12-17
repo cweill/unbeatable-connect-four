@@ -6,18 +6,48 @@ import (
 	"math/rand"
 )
 
-const maxDepth = 5
-const maxAlphabetaDepth = 8
+// Difficulty represents how challenging the AI will be.
+type Difficulty int
+
+const (
+	// Easy is beatable.
+	Easy Difficulty = iota
+	// Medium is doable.
+	Medium
+	// Hard is a challenge.
+	Hard
+	// Impossible.
+	Impossible
+)
+
+// How many moves the AI should look ahead.
+const (
+	easyDepth = 1
+	mediumDepth = 3
+	hardDepth = 5
+	impossibleDepth = 10
+)
 
 // AI represents an artificial intelligence player.
 type AI struct {
 	Player game.Player
+	Difficulty Difficulty
 }
 
-// ChooseMove will return the best possible move given the state of the game.
+// ChooseMove will return the best possible move given the state of the game, 
+// and the difficulty of the AI.
 func (a *AI) ChooseMove(s *game.State) game.Column {
-	// col, _ := a.minmax(s, maxDepth, true)
-	col, _ := a.alphabeta(s, maxAlphabetaDepth, -infinite, infinite, true)
+	var col game.Column
+	switch a.Difficulty {
+	case Easy:
+		col, _ = a.minmax(s, easyDepth, true)
+	case Medium:
+		col, _ = a.minmax(s, mediumDepth, true)
+	case Hard:
+		col, _ = a.minmax(s, hardDepth, true)
+	case Impossible:
+		col, _ = a.alphabeta(s, impossibleDepth, -infinite, infinite, true)
+	}
 	return col
 }
 
@@ -102,6 +132,7 @@ func (a *AI) alphabeta(s *game.State, depth int, α, β value, maxPlayer bool) (
 				α = v
 			}
 			if β <= α {
+				// Prune.
 				break
 			}
 		}
@@ -121,6 +152,7 @@ func (a *AI) alphabeta(s *game.State, depth int, α, β value, maxPlayer bool) (
 			β = v
 		}
 		if β <= α {
+			// Prune.
 			break
 		}
 	}

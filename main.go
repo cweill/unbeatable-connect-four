@@ -10,11 +10,8 @@ import (
 )
 
 func main() {
-	var aip *ai.AI
 	g := game.New()
-	if requestPlayWithAI() {
-		aip = &ai.AI{Player: game.Black}
-	}
+	aip := requestPlayWithAI()
 	for {
 		fmt.Println(g)
 		fmt.Printf("Player %v's turn!\n", g.Turn)
@@ -44,17 +41,41 @@ func main() {
 	}
 }
 
-func requestPlayWithAI() bool {
+func requestPlayWithAI() *ai.AI {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
+		// AI opponent?
 		fmt.Print("Enable AI? [y/n]: ")
 		scanner.Scan()
 		switch scanner.Text() {
 		case "y":
-			return true
+			return requestAIDifficulty()
 		case "n":
-			return false
+			return nil
 		}
+	}
+}
+
+func requestAIDifficulty() *ai.AI {
+	aip := &ai.AI{Player: game.Black}
+	scanner := bufio.NewScanner(os.Stdin)
+	for {
+		// AI difficulty?
+		fmt.Print("AI difficulty [e(asy)/m(edium)/h(ard)/i(mpossible)]: ")
+		scanner.Scan()
+		switch scanner.Text() {
+		case "e":
+			aip.Difficulty = ai.Easy
+		case "m":
+			aip.Difficulty = ai.Medium
+		case "h":
+			aip.Difficulty = ai.Hard
+		case "i":
+			aip.Difficulty = ai.Impossible
+		default:
+			continue
+		}
+		return aip
 	}
 }
 
