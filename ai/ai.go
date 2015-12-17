@@ -22,19 +22,19 @@ const (
 
 // How many moves the AI should look ahead.
 const (
-	easyDepth = 1
-	mediumDepth = 3
-	hardDepth = 5
+	easyDepth       = 1
+	mediumDepth     = 3
+	hardDepth       = 5
 	impossibleDepth = 10
 )
 
 // AI represents an artificial intelligence player.
 type AI struct {
-	Player game.Player
+	Player     game.Player
 	Difficulty Difficulty
 }
 
-// ChooseMove will return the best possible move given the state of the game, 
+// ChooseMove will return the best possible move given the state of the game,
 // and the difficulty of the AI.
 func (a *AI) ChooseMove(s *game.State) game.Column {
 	var col game.Column

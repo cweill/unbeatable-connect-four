@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"./ai"
 	"./game"
+	"bufio"
 	"fmt"
 	"os"
 	"strconv"
@@ -14,7 +14,7 @@ func main() {
 	aip := requestPlayWithAI()
 	for {
 		fmt.Println(g)
-		fmt.Printf("Player %v's turn!\n", g.Turn)
+		fmt.Printf("%v's turn!\n", g.Turn)
 
 		// Move.
 		var col game.Column

@@ -9,35 +9,45 @@ import (
 type Player int
 
 const (
-	// White is represented by an "X".
-	White Player = iota
-	// Black is represented by an "O".
+	// Nobody.
+	Nobody Player = iota
+	// White moves first.
+	White
+	// Black moves second.
 	Black
 )
 
-// String returns the string representation of a player.
 func (p Player) String() string {
-	if p == White {
-		return "X"
+	switch p {
+	case White:
+		return "White"
+	case Black:
+		return "Black"
 	}
-	return "O"
+	return "Nobody"
 }
 
 // State represents the Connect-Four game's current state.
 type State struct {
 	// Grid represents the chips in the board.
-	Grid [][]string
+	Grid [][]Player
 	// Turn is the current player's turn.
 	Turn Player
 }
 
+// Game constants.
+const (
+	boardRows    = 6
+	boardColumns = 7
+)
+
 // New returns a new Connect-Four game.
 func New() *State {
 	return &State{
-		Grid: func() [][]string {
-			g := make([][]string, 6)
+		Grid: func() [][]Player {
+			g := make([][]Player, boardRows)
 			for i := 0; i < len(g); i++ {
-				g[i] = make([]string, 7)
+				g[i] = make([]Player, boardColumns)
 			}
 			return g
 		}(),
@@ -47,9 +57,9 @@ func New() *State {
 
 // copy creates a deep copy of a given state.
 func (s *State) copy() *State {
-	var g [][]string
+	var g [][]Player
 	for _, col := range s.Grid {
-		var c []string
+		var c []Player
 		for _, v := range col {
 			c = append(c, v)
 		}
@@ -67,7 +77,7 @@ func (s *State) IsGameOver() bool {
 	for i := 0; i < len(s.Grid); i++ {
 		for j := 0; j < len(s.Grid[i]); j++ {
 			v := s.Grid[i][j]
-			if v == "" {
+			if v == Nobody {
 				freeSpace = true
 				continue
 			}
@@ -104,7 +114,7 @@ func (s *State) IsValidMove(c Column) bool {
 		return false
 	}
 	for _, row := range s.Grid {
-		if row[c] == "" {
+		if row[c] == Nobody {
 			return true
 		}
 	}
@@ -120,8 +130,8 @@ func (s *State) Move(c Column) (*State, error) {
 	}
 	cp := s.copy()
 	for _, row := range cp.Grid {
-		if row[c] == "" {
-			row[c] = cp.Turn.String()
+		if row[c] == Nobody {
+			row[c] = cp.Turn
 			return cp, nil
 		}
 	}
@@ -146,16 +156,45 @@ func (s *State) String() string {
 	res := "\n"
 	for i := len(s.Grid) - 1; i >= 0; i-- {
 		row := s.Grid[i]
-		res += "|"
+		res += "│"
+		for range row {
+			res += "         │"
+		}
+		res += "\n│"
 		for _, v := range row {
-			if v == "" {
-				res += " |"
-			} else {
-				res += v + "|"
+			switch v {
+			case Nobody:
+				res += "         │"
+			case White:
+				res += `  ╔╦╦╦╗  │`
+			case Black:
+				res += `  ╔═══╗  │`
 			}
 		}
-		res += "\n"
+		res += "\n|"
+		for _, v := range row {
+			switch v {
+			case Nobody:
+				res += "         │"
+			case White:
+				res += `  ╠╬╬╬╣  │`
+			case Black:
+				res += `  ║   ║  │`
+			}
+		}
+		res += "\n|"
+		for _, v := range row {
+			switch v {
+			case Nobody:
+				res += "         │"
+			case White:
+				res += `  ╚╩╩╩╝  │`
+			case Black:
+				res += `  ╚═══╝  │`
+			}
+		}
+		res += "\n│_________│_________│_________│_________│_________│_________│_________│\n"
 	}
-	res += "|1|2|3|4|5|6|7|\n"
+	res += "│    1    │    2    │    3    │    4    │    5    │    6    │    7    │\n"
 	return res
 }
