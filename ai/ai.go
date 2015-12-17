@@ -6,6 +6,7 @@ import (
 )
 
 const maxDepth = 5
+const maxAlphabetaDepth = 8
 
 // AI represents an artificial intelligence player.
 type AI struct {
@@ -14,7 +15,8 @@ type AI struct {
 
 // ChooseMove will return the best possible move given the state of the game.
 func (a *AI) ChooseMove(s *game.State) game.Column {
-	col, _ := a.minmax(s, maxDepth, true)
+	// col, _ := a.minmax(s, maxDepth, true)
+	col, _ := a.alphabeta(s, maxAlphabetaDepth, -infinite, infinite, true)
 	return col
 }
 
@@ -74,4 +76,52 @@ func (a *AI) minmax(s *game.State, depth int, maxPlayer bool) (game.Column, valu
 		}
 	}
 	return bestCol, bestVal
+}
+
+// alphabeta implements the Min-Max algorithm with Alpha-Beta pruning, allowing
+// the AI to search deeper down the game tree. Returns the best move and value
+// of that move.
+func (a *AI) alphabeta(s *game.State, depth int, α, β value, maxPlayer bool) (game.Column, value) {
+	if depth == 0 || s.IsGameOver() {
+		return game.MaxColumn, a.stateValue(s, depth)
+	}
+	var bestCol game.Column
+	if maxPlayer {
+		v := -infinite
+		for i := game.Column(0); i <= game.MaxColumn; i++ {
+			if !s.IsValidMove(i) {
+				continue
+			}
+			ss, _ := s.Move(i)
+			if _, val := a.alphabeta(ss.NextTurn(), depth-1, α, β, !maxPlayer); val > v {
+				v = val
+				bestCol = i
+			}
+			if v > α {
+				α = v
+			}
+			if β <= α {
+				break
+			}
+		}
+		return bestCol, v
+	}
+	v := infinite
+	for i := game.Column(0); i <= game.MaxColumn; i++ {
+		if !s.IsValidMove(i) {
+			continue
+		}
+		ss, _ := s.Move(i)
+		if _, val := a.alphabeta(ss.NextTurn(), depth-1, α, β, !maxPlayer); val < v {
+			v = val
+			bestCol = i
+		}
+		if v < β {
+			β = v
+		}
+		if β <= α {
+			break
+		}
+	}
+	return bestCol, v
 }
