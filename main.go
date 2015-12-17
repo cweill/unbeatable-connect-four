@@ -2,8 +2,8 @@ package main
 
 import (
 	"bufio"
-	"unbeatable-connect-four/ai"
-	"unbeatable-connect-four/game"
+	"./ai"
+	"./game"
 	"fmt"
 	"os"
 	"strconv"

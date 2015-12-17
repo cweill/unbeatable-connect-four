@@ -2,7 +2,7 @@
 package ai
 
 import (
-	"unbeatable-connect-four/game"
+	"../game"
 )
 
 const maxDepth = 5
