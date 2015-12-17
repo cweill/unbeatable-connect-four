@@ -3,6 +3,7 @@ package ai
 
 import (
 	"../game"
+	"math/rand"
 )
 
 const maxDepth = 5
@@ -57,7 +58,7 @@ func (a *AI) minmax(s *game.State, depth int, maxPlayer bool) (game.Column, valu
 		bestVal = -infinite
 	}
 	var bestCol game.Column
-	for i := game.Column(0); i <= game.MaxColumn; i++ {
+	for _, i := range shuffledColumns() {
 		if !s.IsValidMove(i) {
 			continue
 		}
@@ -88,7 +89,7 @@ func (a *AI) alphabeta(s *game.State, depth int, α, β value, maxPlayer bool) (
 	var bestCol game.Column
 	if maxPlayer {
 		v := -infinite
-		for i := game.Column(0); i <= game.MaxColumn; i++ {
+		for _, i := range shuffledColumns() {
 			if !s.IsValidMove(i) {
 				continue
 			}
@@ -107,7 +108,7 @@ func (a *AI) alphabeta(s *game.State, depth int, α, β value, maxPlayer bool) (
 		return bestCol, v
 	}
 	v := infinite
-	for i := game.Column(0); i <= game.MaxColumn; i++ {
+	for _, i := range shuffledColumns() {
 		if !s.IsValidMove(i) {
 			continue
 		}
@@ -124,4 +125,19 @@ func (a *AI) alphabeta(s *game.State, depth int, α, β value, maxPlayer bool) (
 		}
 	}
 	return bestCol, v
+}
+
+// shuffledColumns returns the shuffled game columns to introduce some
+// randomness in the way the AI plays.
+func shuffledColumns() []game.Column {
+	var cols []game.Column
+	for i := game.Column(0); i <= game.MaxColumn; i++ {
+		cols = append(cols, i)
+	}
+	// Shuffle.
+	for i := range cols {
+		j := rand.Intn(i + 1)
+		cols[i], cols[j] = cols[j], cols[i]
+	}
+	return cols
 }
