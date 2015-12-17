@@ -32,7 +32,7 @@ func main() {
 		// Check end game.
 		if gg.IsGameOver() {
 			fmt.Println(gg)
-			fmt.Printf("Player %v wins!\n", gg.Turn)
+			fmt.Printf("%v wins!\n", gg.Turn)
 			return
 		}
 
