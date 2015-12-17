@@ -83,30 +83,33 @@ func (a *AI) minmax(s *game.State, depth int, maxPlayer bool) (game.Column, valu
 	if depth == 0 || s.IsGameOver() {
 		return game.MaxColumn, a.stateValue(s, depth)
 	}
-	bestVal := infinite
-	if maxPlayer {
-		bestVal = -infinite
-	}
 	var bestCol game.Column
+	if maxPlayer {
+		v := -infinite
+		for _, i := range shuffledColumns() {
+			if !s.IsValidMove(i) {
+				continue
+			}
+			ss, _ := s.Move(i)
+			if _, val := a.minmax(ss.NextTurn(), depth-1, !maxPlayer); val > v {
+				v = val
+				bestCol = i
+			}
+		}
+		return bestCol, v
+	}
+	v := infinite
 	for _, i := range shuffledColumns() {
 		if !s.IsValidMove(i) {
 			continue
 		}
 		ss, _ := s.Move(i)
-		_, val := a.minmax(ss.NextTurn(), depth-1, !maxPlayer)
-		if maxPlayer {
-			if val > bestVal {
-				bestVal = val
-				bestCol = i
-			}
-		} else {
-			if val < bestVal {
-				bestVal = val
-				bestCol = i
-			}
+		if _, val := a.minmax(ss.NextTurn(), depth-1, !maxPlayer); val < v {
+			v = val
+			bestCol = i
 		}
 	}
-	return bestCol, bestVal
+	return bestCol, v
 }
 
 // alphabeta implements the Min-Max algorithm with Alpha-Beta pruning, allowing
